@@ -10,7 +10,7 @@ import UIKit
 
 class ToDoListViewController: UITableViewController {
     
-    let itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
+    var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,7 +28,7 @@ class ToDoListViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return itemArray.count
     }
     
     //MARK: - tableView Method - Delegate
@@ -50,15 +50,18 @@ class ToDoListViewController: UITableViewController {
 
     @IBAction func addNewlist(_ sender: UIBarButtonItem) {
         
-        var textInputFromAlert : String = ""
+        var textInputFromAlert = UITextField()
         
         let alert = UIAlertController(title: "add a new item MJ", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "do it now", style: .default) { (action) in
-            print(textInputFromAlert)
+           self.itemArray.append(textInputFromAlert.text!)
+            print("now the cell number is \(self.itemArray.count)")
+            self.tableView.reloadData()
+            
         }
         alert.addTextField { (textYouInput) in
             textYouInput.placeholder = "say come on come on"
-           textInputFromAlert = textYouInput.text!
+            textInputFromAlert = textYouInput
         }
         alert.addAction(action)
         
