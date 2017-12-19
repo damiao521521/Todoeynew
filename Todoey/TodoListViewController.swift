@@ -46,6 +46,23 @@ class ToDoListViewController: UITableViewController {
         print(itemArray[indexPath.row])
     }
     
+    //MARK: - Add Bar Button to 
 
+    @IBAction func addNewlist(_ sender: UIBarButtonItem) {
+        
+        var textInputFromAlert : String = ""
+        
+        let alert = UIAlertController(title: "add a new item MJ", message: "", preferredStyle: .alert)
+        let action = UIAlertAction(title: "do it now", style: .default) { (action) in
+            print(textInputFromAlert)
+        }
+        alert.addTextField { (textYouInput) in
+            textYouInput.placeholder = "say come on come on"
+           textInputFromAlert = textYouInput.text!
+        }
+        alert.addAction(action)
+        
+        present(alert, animated: true, completion: nil)
+    }
 }
 
