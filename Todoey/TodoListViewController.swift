@@ -11,10 +11,16 @@ import UIKit
 class ToDoListViewController: UITableViewController {
     
     var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
+    let myDefaults = UserDefaults.standard
+    let myListName = "defaultDatabase"
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        if let tempArray = myDefaults.array(forKey: myListName) as? [String] {
+            itemArray = tempArray
+        }
+        
     }
 
 
@@ -57,6 +63,7 @@ class ToDoListViewController: UITableViewController {
            self.itemArray.append(textInputFromAlert.text!)
             print("now the cell number is \(self.itemArray.count)")
             self.tableView.reloadData()
+                 self.myDefaults.set(self.itemArray, forKey: self.myListName)
             
         }
         alert.addTextField { (textYouInput) in
