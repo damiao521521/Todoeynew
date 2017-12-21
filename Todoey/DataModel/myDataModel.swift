@@ -8,7 +8,7 @@
 
 import Foundation
 
-class myDataModel {
+class myDataModel : Encodable,Decodable {
     var myTask : String = ""
     var myDone : Bool = false
 }
