@@ -15,8 +15,8 @@ class ToDoListViewController: UITableViewController {
     
     var itemArray = [myDataModel]()
    // var checkedArray : [String] = []
-  //  let myDefaults = UserDefaults.standard
-    let myListName = "defaultDatabase"
+ // let myDefaults = UserDefaults.standard
+  //  let myListName = "defaultDatabase"
 
     override func viewDidLoad() {
         super.viewDidLoad()
