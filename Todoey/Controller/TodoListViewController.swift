@@ -7,41 +7,24 @@
 //
 
 import UIKit
+import CoreData
+
 
 class ToDoListViewController: UITableViewController {
     
-    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Item.plist")
+ //   let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Item.plist")
 
+    let myContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
-    var itemArray = [myDataModel]()
-   // var checkedArray : [String] = []
- // let myDefaults = UserDefaults.standard
-  //  let myListName = "defaultDatabase"
+    var itemArray = [MyItem]()
+    
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-print(dataFilePath)
-        
-        // Do any additional setup after loading the view, typically from a nib.
-//        if let tempArray = myDefaults.array(forKey: myListName) as? [myDataModel] {
-//            itemArray = tempArray
-//        }
-        
-//        let newItem = myDataModel()
-//        newItem.myTask = "Find Mike"
-//        newItem.myDone = true
-//        itemArray.append(newItem)
-//
-//        let newItem2 = myDataModel()
-//        newItem2.myTask = "Find Jack"
-//        itemArray.append(newItem2)
-//
-//        let newItem3 = myDataModel()
-//        newItem3.myTask = "Find Rose"
-//        itemArray.append(newItem3)
-        
-        loadData()
+
+    loadData()
         
     }
 
@@ -55,19 +38,10 @@ print(dataFilePath)
         
         let item = itemArray[indexPath.row]
         
-        cell.textLabel?.text = item.myTask
-        //      print(indexPath.row)
-        
+        cell.textLabel?.text = item.title
+       
         // below is the famous ternary operator !!!
-        cell.accessoryType = itemArray[indexPath.row].myDone == true ? .checkmark : .none
-        
-//        if itemArray[indexPath.row].myDone == true {
-//            cell.accessoryType = .checkmark
-//        }
-//        else {
-//            cell.accessoryType = .none
-//
-//        }
+        cell.accessoryType = itemArray[indexPath.row].done == true ? .checkmark : .none
         
         
         return cell
@@ -83,28 +57,11 @@ print(dataFilePath)
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath){
         tableView.deselectRow(at: indexPath, animated: true)
         
-       itemArray[indexPath.row].myDone = !itemArray[indexPath.row].myDone
+        myContext.delete(itemArray[indexPath.row])
+        itemArray.remove(at: indexPath.row)
+        
+     //  itemArray[indexPath.row].done = !itemArray[indexPath.row].done
         saveData()
-     
-        
-//        if itemArray[indexPath.row].myDone == true {
-//            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-//        }
-//        else {
-//            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-//        }
-        
-//        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-//            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-//          //  checkedArray.remove(at: indexPath.row)
-//        }
-//        else {
-//            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-//          //  checkedArray.append(itemArray[indexPath.row])
-//        }
-        
-        print("now the indexPath is : \(indexPath.row) ")
-        
 
         
     }
@@ -118,17 +75,15 @@ print(dataFilePath)
         let alert = UIAlertController(title: "add a new item MJ", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "do it now", style: .default) { (action) in
             
-            let newTask = myDataModel()
+            let newTask = MyItem(context: self.myContext)
             
-            newTask.myTask = textInputFromAlert.text!
+            newTask.title = textInputFromAlert.text!
+            newTask.done = false
             
             self.itemArray.append(newTask)
             
-            print("now the cell number is \(self.itemArray.count)")
-            
             self.saveData()
             
-            // self.myDefaults.set(self.itemArray, forKey: self.myListName)
             
         }
         alert.addTextField { (textYouInput) in
@@ -142,33 +97,18 @@ print(dataFilePath)
     }
     
     func saveData () {
-
-        let encoder = PropertyListEncoder() // instance the encoder , you take this is the formatter , once you have the formatter ,format your data first;format your data to encodable.
         
-        do {
-            let myData = try encoder.encode(itemArray)  //format your data to encodable, and put in the buffer
-            try myData.write(to: dataFilePath!)  //once when your data is converted to encodable, it can be "write" into the file system
-        }
-        catch {
-            print(error)
-        }
-                tableView.reloadData()
+       try? myContext.save()
+
+       tableView.reloadData()
+        
     }
     
     func loadData() {
         
+        let myRequest : NSFetchRequest<MyItem> = MyItem.fetchRequest()
+         itemArray =  try! myContext.fetch(myRequest)
         
-        if let myData = try? Data(contentsOf: dataFilePath!) {
-            let myDecoder = PropertyListDecoder()
-            do {
-                itemArray = try myDecoder.decode([myDataModel].self, from: myData)
-            }
-            catch {
-                print(error)
-            }
-        }
-        
-    
     }
     
 }
