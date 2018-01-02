@@ -16,15 +16,25 @@ class ToDoListViewController: UITableViewController {
 
     let myContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
+  
+    
+    var selectedCategoy : MyCategory? {
+        didSet {
+                let initialPredicate =  NSPredicate(format: "parentMyCategory.name MATCHES %@", selectedCategoy!.name!)
+            loadData(of: initialPredicate)
+        }
+    }
+    
+    
     var itemArray = [MyItem]()
     
 
+ 
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
 
-    loadData()
+
         
     }
 
@@ -79,6 +89,8 @@ class ToDoListViewController: UITableViewController {
             
             newTask.title = textInputFromAlert.text!
             newTask.done = false
+            newTask.parentMyCategory = self.selectedCategoy
+            print(newTask.parentMyCategory?.name)
             
             self.itemArray.append(newTask)
             
@@ -98,18 +110,70 @@ class ToDoListViewController: UITableViewController {
     
     func saveData () {
         
-       try? myContext.save()
+       try! myContext.save()
 
        tableView.reloadData()
         
     }
     
-    func loadData() {
+    func loadData(with myRequest : NSFetchRequest<MyItem> = MyItem.fetchRequest(), of myPredicate : NSPredicate ) {
         
+
+        myRequest.predicate = myPredicate
+        
+       itemArray =  try! myContext.fetch(myRequest)
+           tableView.reloadData()
+    }
+    
+
+    
+
+}
+
+extension ToDoListViewController : UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         let myRequest : NSFetchRequest<MyItem> = MyItem.fetchRequest()
-         itemArray =  try! myContext.fetch(myRequest)
+        
+        print(searchBar.text!)
+        
+       let searchPredicate1 = NSPredicate(format: "parentMyCategory.name MATCHES %@", selectedCategoy!.name!)
+       let searchPredicate2 = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+      //  let searchCompoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [searchPredicate1,searchPredicate2])
+        let searchCompoundPredicate = NSCompoundPredicate(type: .and, subpredicates: [searchPredicate1,searchPredicate2])
+        myRequest.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+        
+      loadData(with: myRequest, of: searchCompoundPredicate)
+        
         
     }
     
+
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        if searchBar.text?.count == 0 {
+            let initialPredicate =  NSPredicate(format: "parentMyCategory.name MATCHES %@", selectedCategoy!.name!)
+            loadData(of:initialPredicate )
+            DispatchQueue.main.async {
+                
+                 searchBar.resignFirstResponder()
+                
+            }
+            
+        }
+        
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
