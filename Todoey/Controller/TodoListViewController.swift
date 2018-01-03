@@ -20,8 +20,8 @@ class ToDoListViewController: UITableViewController {
     
     var selectedCategoy : MyCategory? {
         didSet {
-                let initialPredicate =  NSPredicate(format: "parentMyCategory.name MATCHES %@", selectedCategoy!.name!)
-            loadData(of: initialPredicate)
+            
+            loadData()
         }
     }
     
@@ -116,10 +116,15 @@ class ToDoListViewController: UITableViewController {
         
     }
     
-    func loadData(with myRequest : NSFetchRequest<MyItem> = MyItem.fetchRequest(), of myPredicate : NSPredicate ) {
+    func loadData(with myRequest : NSFetchRequest<MyItem> = MyItem.fetchRequest(), of myPredicate : NSPredicate? = nil ) {
         
-
-        myRequest.predicate = myPredicate
+        let searchPredicate1 = NSPredicate(format: "parentMyCategory.name MATCHES %@", selectedCategoy!.name!)
+        
+        if let tempPredicate = myPredicate {
+        myRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: [searchPredicate1,tempPredicate])
+        } else {
+            myRequest.predicate = searchPredicate1
+        }
         
        itemArray =  try! myContext.fetch(myRequest)
            tableView.reloadData()
@@ -136,13 +141,12 @@ extension ToDoListViewController : UISearchBarDelegate {
         
         print(searchBar.text!)
         
-       let searchPredicate1 = NSPredicate(format: "parentMyCategory.name MATCHES %@", selectedCategoy!.name!)
+
        let searchPredicate2 = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-      //  let searchCompoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [searchPredicate1,searchPredicate2])
-        let searchCompoundPredicate = NSCompoundPredicate(type: .and, subpredicates: [searchPredicate1,searchPredicate2])
+
         myRequest.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
         
-      loadData(with: myRequest, of: searchCompoundPredicate)
+      loadData(with: myRequest, of: searchPredicate2)
         
         
     }
@@ -151,8 +155,8 @@ extension ToDoListViewController : UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
         if searchBar.text?.count == 0 {
-            let initialPredicate =  NSPredicate(format: "parentMyCategory.name MATCHES %@", selectedCategoy!.name!)
-            loadData(of:initialPredicate )
+            
+            loadData()
             DispatchQueue.main.async {
                 
                  searchBar.resignFirstResponder()
