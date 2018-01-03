@@ -90,6 +90,7 @@ class ToDoListViewController: UITableViewController {
             newTask.title = textInputFromAlert.text!
             newTask.done = false
             newTask.parentMyCategory = self.selectedCategoy
+            
             print(newTask.parentMyCategory?.name)
             
             self.itemArray.append(newTask)

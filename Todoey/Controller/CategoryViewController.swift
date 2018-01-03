@@ -66,6 +66,7 @@ class CategoryViewController: UITableViewController {
             let newTask = MyCategory(context: self.myCCContext)
             
             newTask.name = textInputFromAlert.text!
+            
   
             
             self.categoryArray.append(newTask)
