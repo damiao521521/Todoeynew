@@ -22,19 +22,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print(Realm.Configuration.defaultConfiguration.fileURL)
  
         
-        let exampleData = myRealmData()
-        exampleData.name = "Miao Jun"
-        exampleData.age = 18
+
         
         do {
               let myRealm = try Realm()
-           try myRealm.write {
-            
-            myRealm.add(exampleData)
-            
+
+           try! myRealm.write {
+            let tempCategory = RealmCategory()
+            tempCategory.name = "Miao Jun"
+            myRealm.add(tempCategory)
             }
            
         }catch {
+            
             print("Here is the realm related eroor :\(error)")
         }
         

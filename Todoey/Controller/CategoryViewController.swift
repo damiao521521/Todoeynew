@@ -7,12 +7,13 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 class CategoryViewController: UITableViewController {
     
-    var categoryArray = [MyCategory]()
-    var myCCContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    let realm = try! Realm()
+    
+    var categoryresults : Results<RealmCategory>?
 
     
     override func viewDidLoad() {
@@ -23,7 +24,7 @@ class CategoryViewController: UITableViewController {
     //MARK: TableView Datasource
    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(withIdentifier: "myCategoryCell", for: indexPath)
-    cell.textLabel?.text = categoryArray[indexPath.row].name
+    cell.textLabel?.text = categoryresults?[indexPath.row].name ?? "come on Sir what do you want from Nil"
     
     
     return cell
@@ -31,24 +32,29 @@ class CategoryViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return categoryArray.count
+        return categoryresults?.count  ?? 1
     }
     
     //MARK: Data Manapulate
     
-    func saveCatetory() {
-        
-       try! myCCContext.save()
-        
+    func save(object the : RealmCategory) {
+        do {
+           try realm.write {
+            
+                realm.add(the)
+            
+            }
+        }catch {
+            print(error)
+        }
+      
         tableView.reloadData()
     }
     
-    func loadCategory(with request: NSFetchRequest<MyCategory> = MyCategory.fetchRequest()) {
-        do {
-        categoryArray = try myCCContext.fetch(request)
-        } catch {
-            print("nothing at the moment")
-        }
+    func loadCategory() {
+        
+      categoryresults =  realm.objects(RealmCategory.self)
+        
         tableView.reloadData()
         
     }
@@ -63,15 +69,12 @@ class CategoryViewController: UITableViewController {
         let alert = UIAlertController(title: "add a new item MJ", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "do it now", style: .default) { (action) in
             
-            let newTask = MyCategory(context: self.myCCContext)
+            let newTask = RealmCategory()
             
             newTask.name = textInputFromAlert.text!
+
             
-  
-            
-            self.categoryArray.append(newTask)
-            
-            self.saveCatetory()
+            self.save(object: newTask)
             
             
         }
@@ -103,7 +106,7 @@ class CategoryViewController: UITableViewController {
         let myDestinationVC = segue.destination as! ToDoListViewController
     
         if let indexPath = tableView.indexPathForSelectedRow {
-            myDestinationVC.selectedCategoy = categoryArray[indexPath.row]
+            myDestinationVC.selectedCategoy = categoryresults?[indexPath.row]
         }
         
     

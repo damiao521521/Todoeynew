@@ -1,5 +1,5 @@
 //
-//  myRealmData.swift
+//  realmCategory.swift
 //  Todoey
 //
 //  Created by Jun Miao on 03/01/2018.
@@ -9,7 +9,8 @@
 import Foundation
 import RealmSwift
 
-class myRealmData: Object {
-    @objc dynamic  var name : String = ""
-    @objc dynamic  var age : Int = 0
+class RealmCategory : Object {
+    @objc dynamic   var name : String = ""
+    let items = List<RealmItem>()
+    
 }
