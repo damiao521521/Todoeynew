@@ -112,7 +112,9 @@ class ToDoListViewController: UITableViewController {
                     
                     let newTask = RealmItem()
                     newTask.title = textInputFromAlert.text!
-                    tempcategoary.items.append(newTask)  //after eating , good good study
+                   // newTask.createAt = Date()
+                    
+                    tempcategoary.items.append(newTask)
                     
                   //  self.myRealm.add(newTask)
                 }
@@ -155,7 +157,7 @@ class ToDoListViewController: UITableViewController {
 extension ToDoListViewController : UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
 
-        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "title", ascending: true)
+        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "createAt", ascending: true)
         tableView.reloadData()
 
     }
